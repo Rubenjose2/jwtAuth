@@ -1,9 +1,15 @@
 version: 2
 jobs:
-  build:
-    docker:
-      # Declaring the use of the image
-      - image: circleci/node:10.0
-    steps:
-      - checkout
-      - run: echo "my firts test with circle ci"
+  image:
+    build:
+      docker:
+        # Declaring the use of the image
+        - image: circleci/node:10.0
+      steps:
+        - checkout
+        - run: echo "my firts test with circle ci"
+workflow:
+  version: 2
+  compilation:
+    jobs:
+      - image
