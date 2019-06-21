@@ -8,6 +8,7 @@ jobs:
       - checkout
       - run: echo "my firts test with circle ci"
       - run: npm install
+      - run: echo "NPN INSTALL DONE"
 workflows:
   version: 2
   workflow:
