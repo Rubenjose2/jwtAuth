@@ -7,3 +7,9 @@ jobs:
     steps:
       - checkout
       - run: echo "my firts test with circle ci"
+      - run: npm install
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - build
