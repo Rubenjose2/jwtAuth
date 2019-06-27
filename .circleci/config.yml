@@ -1,15 +1,29 @@
 version: 2
+defaults: &defaults
+  docker:
+    - image: gcr.io/newprotectruben1/googlesdk:v1
+      auth:
+        username: _json_key
+        password: $GCLOUD_SERVICE_KEY
 jobs:
   build:
-    docker:
-      # Declaring the use of the image
-      - image: circleci/node:10.0
+    <<: *defaults
     steps:
       - checkout
+      - setup_remote_docker
+      - run:
+          name: Generate the full image fo the docker image
       - run: echo "my firts test with circle ci"
       - run: npm install
-workflows:
-  version: 2
-  workflow:
-    jobs:
-      - build
+
+  deploy:
+    <<: *defaults
+    steps:
+      - run: |
+          echo ${GCLOUD_SERVICE_KEY}
+  workflows:
+    version: 2
+    workflow:
+      jobs:
+        - build
+        - deploy

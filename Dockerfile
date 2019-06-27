@@ -1,6 +1,6 @@
 #STAGE 1
 # I'm creating the image containing the NODE server. This image would feed the application to run local or on a server like apache or NGINX
-FROM node:10.9
+FROM node:10.16.0-slim
 RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
 COPY package*.json ./
