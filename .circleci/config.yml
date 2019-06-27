@@ -13,9 +13,6 @@ jobs:
       - setup_remote_docker
       - run:
           name: Generate the full image fo the docker image
-      - run: echo "my firts test with circle ci"
-      - run: npm install
-
   deploy:
     <<: *defaults
     steps:
