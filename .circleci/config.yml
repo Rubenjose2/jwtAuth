@@ -21,8 +21,9 @@ jobs:
     steps:
       - run: |
           echo ${GCLOUD_SERVICE_KEY}
-  workflows:
-    version: 2
+
+workflows:
+  version: 2
     workflow:
       jobs:
         - build
