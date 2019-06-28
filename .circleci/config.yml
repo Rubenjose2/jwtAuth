@@ -14,7 +14,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Test connection to Google
-          commnad: |
+          command: |
             echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > gcloud-service-key.json
             gcloud auth activate-service-account --key-file gcloud-service-key.json
       - run:
@@ -72,4 +72,6 @@ workflows:
   workflow:
     jobs:
       - build
-      - deploy
+      - deploy:
+          requires:
+            - build
