@@ -62,7 +62,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - attach_workspace
+      - attach_workspace:
           at: workspace
       - run:
           name: Deploy
