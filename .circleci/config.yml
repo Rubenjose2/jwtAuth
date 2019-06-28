@@ -49,9 +49,9 @@ jobs:
             FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
             docker run -d --rm -p 8080:8080 --name angular-app $FULL_DOCKER_IMAGE_NAME
             docker run --network container:angular-app appropriate/curl --retry 10 --retry-connrefused http://localhost:80
-            if [ "${CIRCLE_BRANCH}" ] != "master" ]
+            if [ "${CIRCLE_BRANCH}" != "master" ]
               then
-                cirlceci step halt
+                circleci step halt
             fi
       - persist_to_workspace:
           root: .
@@ -60,8 +60,28 @@ jobs:
   deploy:
     <<: *defaults
     steps:
-      - run: |
-          echo ${GCLOUD_SERVICE_KEY}
+      - checkout
+      - setup_remote_docker
+      - attach_workspace
+          at: workspace
+      - run:
+          name: Deploy
+          commmand: |
+            echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
+            set -x
+            gcloud auth activate-service-account --key-file gcloud-service-key.json
+            gcloud --quiet config set project $GOOGLE_PROJECT_ID
+            gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
+            EXISTING_CLUSTER=$(gcloud container clusters list --format="value(name)" --filter="name=$GOOGLE_CLUSTER_NAME")
+            if [ "${EXISTING_CLUSTER}" != $GOOGLE_CLUSTER_NAME ]
+            then
+              # Create cluster if it doesn't already exist
+              gcloud --quiet container cluster create $GOOGLE_CLUSTER_NAME --num-nodes=1
+            else
+              gcloud --quiet container cluster get-credentials $GOOGLE_CLUSTER_NAME
+            fi
+            FULL_DOCKER_IMAGE_NAME=$(cat workspace/full_docker_image_name)
+            # Replace DOCKER_IMAGE_NAME placeholder in manifest with actual image name
 
 workflows:
   version: 2
