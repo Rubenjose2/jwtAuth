@@ -29,6 +29,7 @@ jobs:
           command: |
             FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
             docker build -t $FULL_DOCKER_IMAGE_NAME -f Dockerfile_SC .
+            echo $FULL_DOCKER_IMAGE_NAME
       - run:
           name: Deploy
           command: |
