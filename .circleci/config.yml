@@ -82,6 +82,11 @@ jobs:
             fi
             FULL_DOCKER_IMAGE_NAME=$(cat workspace/full_docker_image_name)
             # Replace DOCKER_IMAGE_NAME placeholder in manifest with actual image name
+            KUBE_CONFIG=$(cat /manifests/angular-test-cli-all-one.yml.template | sed "s|DOCKER_IMAGE_NAME|$FULL_DOCKER_IMAGE_NAME|g")
+            echo "$KUBE_CONFIG" | kubectl apply -f -
+            # wait for deployment to finish
+            kubectl rollout status deployment/hiangular
+            kubectl get pods
 
 workflows:
   version: 2
