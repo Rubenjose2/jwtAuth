@@ -24,12 +24,13 @@ metadata:
 spec:
   replicas: 1
   template:
-    labels:
-      app: test
-      tier: web
-  spec:
-    containers:
-      - name: hello-angular
-        image: DOCKER_IMAGE_NAME
-        ports:
-          -containerPort: 80
+    metadata:
+      labels:
+        app: test
+        tier: web
+    spec:
+      containers:
+        - name: hello-angular
+          image: DOCKER_IMAGE_NAME
+          ports:
+            -containerPort: 80
