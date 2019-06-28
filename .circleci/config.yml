@@ -87,8 +87,7 @@ workflows:
   version: 2
   workflow:
     jobs:
-      -deploy
-#      - build
-#      - deploy:
-#          requires:
-#            - build
+      - build
+      - deploy:
+          requires:
+            - build
