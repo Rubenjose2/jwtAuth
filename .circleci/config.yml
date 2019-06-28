@@ -15,8 +15,6 @@ jobs:
       - run:
           name: Generate the full image fo the docker image
           command: |
-            echo $CIRCLE_BRANCH
-            echo $CIRCLE_BUILD_NUM
             set -x
             if [ "{CIRCLE_BRANCH}" == "master" ]
             then
@@ -40,6 +38,7 @@ jobs:
               echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
               gcloud auth activate-service-account --key-file gcloud-service-key.json
               gcloud --quiet auth configure-docker
+              echo $FULL_DOCKER_IMAGE
             else
               echo "Not master branch; skip image push.."
             fi
@@ -48,7 +47,8 @@ jobs:
           command: |
             set -x
             FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
-            docker run -d -rm -p 8080:8080 -name angualar-app appropiate/curl --retry 10 -retry-conrefused http://localhost:8080
+            docker run -d --rm -p 8080:8080 --name angular-app $FULL_DOCKER_IMAGE_NAME
+            docker run --network container:angular-app appropriate/curl --retry--connrefused http://localhost:8080
             if [ "${CIRCLE_BRANCH}" ] != "master" ]
               then
                 cirlceci step halt
