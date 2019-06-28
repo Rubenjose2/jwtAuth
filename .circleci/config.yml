@@ -15,7 +15,7 @@ jobs:
       - run:
           name: Test connection to Google
           command: |
-            echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > gcloud-service-key.json
+            echo $GCLOUD_SERVICE_KEY  > gcloud-service-key.json
             cat gcloud-service-key.json
             gcloud auth activate-service-account --key-file gcloud-service-key.json
       - run:
