@@ -76,9 +76,9 @@ jobs:
             if [ "${EXISTING_CLUSTER}" != $GOOGLE_CLUSTER_NAME ]
             then
               # Create cluster if it doesn't already exist
-              gcloud --quiet container cluster create $GOOGLE_CLUSTER_NAME --num-nodes=1
+              gcloud --quiet container clusters create $GOOGLE_CLUSTER_NAME --num-nodes=1
             else
-              gcloud --quiet container cluster get-credentials $GOOGLE_CLUSTER_NAME
+              gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
             fi
             FULL_DOCKER_IMAGE_NAME=$(cat workspace/full_docker_image_name)
             # Replace DOCKER_IMAGE_NAME placeholder in manifest with actual image name
