@@ -30,33 +30,56 @@ jobs:
             FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
             docker build -t $FULL_DOCKER_IMAGE_NAME -f Dockerfile_SC .
       - run:
-          name: Push Image
+          name: Deploy
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]
-            then
-              FULL_DOCKER_IMAGE=$(cat full_docker_image_name)
-              echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
-              gcloud auth activate-service-account --key-file gcloud-service-key.json
-              gcloud --quiet auth configure-docker
-              echo $FULL_DOCKER_IMAGE
-            else
-              echo "Not master branch; skip image push.."
-            fi
-      - run:
-          name: Test Local image
-          command: |
+            echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
             set -x
-            FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
-            docker run -d --rm -p 8080:8080 --name angular-app $FULL_DOCKER_IMAGE_NAME
-            docker run --network container:angular-app appropriate/curl --retry 10 --retry-connrefused http://localhost:80
-            if [ "${CIRCLE_BRANCH}" != "master" ]
-              then
-                circleci step halt
+            gcloud auth activate-service-account --key-file gcloud-service-key.json
+            gcloud --quiet config set project $GOOGLE_PROJECT_ID
+            gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
+            EXISTING_CLUSTER=$(gcloud container clusters list --format="value(name)" --filter="name=$GOOGLE_CLUSTER_NAME")
+            if [ "${EXISTING_CLUSTER}" != $GOOGLE_CLUSTER_NAME ]
+            then
+              # Create cluster if it doesn't already exist
+              gcloud --quiet container clusters create $GOOGLE_CLUSTER_NAME --num-nodes=1
+            else
+              gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
             fi
-      - persist_to_workspace:
-          root: .
-          paths:
-            - full_docker_image_name
+            FULL_DOCKER_IMAGE_NAME=$(cat workspace/full_docker_image_name)
+            # Replace DOCKER_IMAGE_NAME placeholder in manifest with actual image name
+            KUBE_CONFIG=$(cat manifests/angular-test-cli-all-one.yml.template | sed "s|DOCKER_IMAGE_NAME|$FULL_DOCKER_IMAGE_NAME|g")
+            echo "$KUBE_CONFIG" | kubectl apply -f -
+            # wait for deployment to finish
+            kubectl rollout status deployment/hiangular
+            kubectl get pods
+#      - run:
+#          name: Push Image
+#          command: |
+#            if [ "${CIRCLE_BRANCH}" == "master" ]
+#            then
+#              FULL_DOCKER_IMAGE=$(cat full_docker_image_name)
+#              echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
+#              gcloud auth activate-service-account --key-file gcloud-service-key.json
+#              gcloud --quiet auth configure-docker
+#              echo $FULL_DOCKER_IMAGE
+#            else
+#              echo "Not master branch; skip image push.."
+#            fi
+#      - run:
+#          name: Test Local image
+#          command: |
+#            set -x
+#            FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
+#            docker run -d --rm -p 8080:8080 --name angular-app $FULL_DOCKER_IMAGE_NAME
+#            docker run --network container:angular-app appropriate/curl --retry 10 --retry-connrefused http://localhost:80
+#            if [ "${CIRCLE_BRANCH}" != "master" ]
+#              then
+#                circleci step halt
+#            fi
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - full_docker_image_name
   deploy:
     <<: *defaults
     steps:
