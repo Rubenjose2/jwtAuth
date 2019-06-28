@@ -15,6 +15,8 @@ jobs:
       - run:
           name: Generate the full image fo the docker image
           command: |
+            echo $CIRCLE_BRANCH
+            echo $CIRCLE_BUILD_NUM
             set -x
             if [ "{CIRCLE_BRANCH}" == "master" ]
             then
@@ -38,7 +40,7 @@ jobs:
               echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
               gcloud auth activate-service-account --key-file gcloud-service-key.json
               gcloud --quiet auth configure-docker
-              docker push $FULL_DOCKER_IMAGE
+#              docker push $FULL_DOCKER_IMAGE
             else
               echo "Not master branch; skip image push.."
             fi
