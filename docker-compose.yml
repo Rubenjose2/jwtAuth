@@ -3,7 +3,7 @@ version: '3.5'
 services:
   angular-service:
     container_name: angularcontaier
-    build: ./
+    build: ./dockersfiles/local_run
     working_dir: /usr/src/app
     volumes:
       - ../JwtAuth:/usr/src/app
@@ -12,3 +12,6 @@ services:
     command: >
       bash -c "npm install && npm start"
 
+  angular-buils:
+    container_name: app-build-dist
+    build: ./dockersfiles/build

@@ -1,10 +1,16 @@
 #STAGE 1
 # I'm creating the image containing the NODE server. This image would feed the application to run local or on a server like apache or NGINX
-FROM node:10.16.0-slim
+FROM node:10.16.0-slim as node
 RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install -g @angular/cli
 COPY . .
-EXPOSE 4200
+# Building the project and creating the dist folder
+RUN ng build --prod
 
+# STAGE 2
+
+FROM nginx:1.17.0-alpine
+COPY --from=node /usr/src/app/dist/JwtAuth /usr/share/nginx/html
+#COPY ngnix.conf /etc/nginx/conf.d/default.conf

@@ -13,6 +13,16 @@ jobs:
       - setup_remote_docker
       - run:
           name: Generate the full image fo the docker image
+          command: |
+            set -x
+            if [ "{CIRCLE_BRANCH}" == "master" ]
+            then
+              DOCKER_IMAGE_TAG=v${CIRCLE_BUILD_NUM}
+              echo "$DOCKER_IMAGE_NAME: $DOCKER_IMAGE_TAG" > full_docker_image_name
+            else
+              DOCKER_IMAGE_TAG=${CIRCLE_BRANCH}
+              echo "angular-app:$DOCKER_IMAGE_TAG" > full_docker_image_name
+            fi
   deploy:
     <<: *defaults
     steps:
