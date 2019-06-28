@@ -40,7 +40,6 @@ jobs:
               echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
               gcloud auth activate-service-account --key-file gcloud-service-key.json
               gcloud --quiet auth configure-docker
-#              docker push $FULL_DOCKER_IMAGE
             else
               echo "Not master branch; skip image push.."
             fi
