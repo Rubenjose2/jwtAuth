@@ -34,13 +34,28 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]
             then
-              FULL_DOCKER_IMAGE=$(cat full_docker_image_name}
+              FULL_DOCKER_IMAGE=$(cat full_docker_image_name)
               echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > gcloud-service-key.json
               gcloud auth activate-service-account --key-file gcloud-service-key.json
               gcloud --quiet auth configure-docker
               docker push $FULL_DOCKER_IMAGE
             else
               echo "Not master branch; skip image push.."
+            fi
+      - run:
+          name: Test Local image
+          command: |
+            set -x
+            FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
+            docker run -d -rm -p 8080:8080 -name angualar-app appropiate/curl --retry 10 -retry-conrefused http://localhost:8080
+            if [ "${CIRCLE_BRANCH}" ] != "master" ]
+              then
+                cirlceci step halt
+            fi
+      - persist_to_workspace:
+          root: .
+          paths:
+            - full_docker_image_name
   deploy:
     <<: *defaults
     steps:
