@@ -1,7 +1,8 @@
 version: 2
 defaults: &defaults
   docker:
-    - image: gcr.io/newprotectruben1/googlesdk:v1
+#    - image: gcr.io/newprotectruben1/googlesdk:v1
+    - image: google/cloud-sdk@sha256:126a49cfa2aa6e20d561fa14999bf657bc341efeba04939bd2f612bf843d12a6
       auth:
         username: _json_key
         password: $GCLOUD_SERVICE_KEY
