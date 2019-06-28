@@ -23,6 +23,23 @@ jobs:
               DOCKER_IMAGE_TAG=${CIRCLE_BRANCH}
               echo "angular-app:$DOCKER_IMAGE_TAG" > full_docker_image_name
             fi
+      - run:
+          name: Build Image
+          command: |
+            FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
+            docker build -t $FULL_DOCKER_IMAGE_NAME -f JwtAuth/Dockerfile_SC JwtAuth/
+      - run:
+          name: Push Image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]
+            then
+              FULL_DOCKER_IMAGE=$(cat full_docker_image_name}
+              echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > gcloud-service-key.json
+              gcloud auth activate-service-account --key-file gcloud-service-key.json
+              gcloud --quiet auth configure-docker
+              docker push $FULL_DOCKER_IMAGE
+            else
+              echo "Not master branch; skip image push.."
   deploy:
     <<: *defaults
     steps:
