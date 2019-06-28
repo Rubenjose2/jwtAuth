@@ -28,7 +28,7 @@ jobs:
           name: Build Image
           command: |
             FULL_DOCKER_IMAGE_NAME=$(cat full_docker_image_name)
-            docker build -t $FULL_DOCKER_IMAGE_NAME -f JwtAuth/Dockerfile_SC JwtAuth/
+            docker build -t $FULL_DOCKER_IMAGE_NAME -f Dockerfile_SC .
       - run:
           name: Push Image
           command: |
