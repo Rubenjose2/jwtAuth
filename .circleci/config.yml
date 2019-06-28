@@ -13,6 +13,11 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: Test connection to Google
+          commnad: |
+            echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > gcloud-service-key.json
+            gcloud auth activate-service-account --key-file gcloud-service-key.json
+      - run:
           name: Generate the full image fo the docker image
           command: |
             set -x
@@ -35,7 +40,7 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ]
             then
               FULL_DOCKER_IMAGE=$(cat full_docker_image_name)
-              echo ${GCLOUD_SERVICE_KEY} | base64 --decode --ignore-garbage > gcloud-service-key.json
+              echo $GCLOUD_SERVICE_KEY | base64 --decode --ignore-garbage > gcloud-service-key.json
               gcloud auth activate-service-account --key-file gcloud-service-key.json
               gcloud --quiet auth configure-docker
               docker push $FULL_DOCKER_IMAGE
@@ -67,4 +72,6 @@ workflows:
   workflow:
     jobs:
       - build
-      - deploy
+      - deploy:
+          requires:
+            - build
