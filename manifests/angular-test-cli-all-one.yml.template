@@ -31,5 +31,5 @@ spec:
       containers:
         - name: hello-angular
           image: DOCKER_IMAGE_NAME
-#          ports:
-#            -containerPort: 80
+          ports:
+            - containerPort: 80
